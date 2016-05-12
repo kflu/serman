@@ -23,7 +23,7 @@ Usage
       -h, --help  output usage information
 
 
-serman is a Windows services manager. It helps to quickly and correctly turn any
+serman is a language agnostic Windows services manager. It helps to quickly and correctly turn any
 app or script into a Window service. The usage pattern is described as below.
 
 1. The developer writes his/her app (`app.js`) that's meant to be deployed as a
