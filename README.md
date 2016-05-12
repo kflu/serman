@@ -15,17 +15,17 @@ app or script into a Window service. The usage pattern is described as below.
    file (`app.xml`) to describe the service.
 2. The developer uploads the application to the machine using whatever
    preferable way it is.
-3. The developer run `serman install app.xml` to install and start the service.
-4. The developer run `serman uninstall app` to uninstall the service.
+3. The developer runs `serman install app.xml` to install and start the service.
+4. The developer runs `serman uninstall app` to uninstall the service.
 
 
 ### Benefits
 
 Usually, it takes a lot of effort or boilerplate to write a service. With
-`serman`, all it takes in extra is a simple manifest file. And the developer can
-focus on the app itself.
+`serman`, all it takes in addition to the app itself is a simple manifest file,
+allowing the developer to better focus on the app.
 
-A sample manifest file looks like this:
+An example manifest file looks like this ([document][2]):
 
     <service>
       <id>hello</id>
@@ -51,12 +51,13 @@ Currently, the supported fields are:
 The absolute path of the directory containing the manifest file **before**
 calling `serman install`.
 
-_Details: This is different than `winsw`'s `%BASE`. `%BASE%` is always
+_Details: This is different than `winsw`'s `%BASE%`. `%BASE%` is always
 dynamically evaluated by `winsw`. If it's used to specify the app path, it
-**only** works with the manifest and app are co-located. However, for ease of
-management, `serman` groups all manifest files under a common top level
-directory, while the actual location of each app can scatter around the file
-system. In this case, you would want to use `{{dir}}` rather than `%BASE%`._
+**only** works when the manifest and app are co-located. However, for ease of
+management (by human), `serman` groups all manifest files under a common top
+level directory (by default `c:\serman\services\`), while the actual locations
+of each app are scattered around the file system. In this case, you would want
+to use `{{dir}}` rather than `%BASE%`._
 
 
 [1]: https://github.com/kohsuke/winsw
