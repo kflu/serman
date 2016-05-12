@@ -7,6 +7,22 @@ Install
     npm install -g serman
 
 
+Usage
+----
+
+    Usage: serman [options] [command]
+
+
+    Commands:
+
+      install [options] <service-config>  install a service: serman install app.xml key1=val1,key2=val2,..
+      uninstall <service_id>              uninstall a service
+
+    Options:
+
+      -h, --help  output usage information
+
+
 serman is a Window services manager. It helps to quickly and correctly turn any
 app or script into a Window service. The usage pattern is described as below.
 
@@ -58,6 +74,47 @@ management (by human), `serman` groups all manifest files under a common top
 level directory (by default `c:\serman\services\`), while the actual locations
 of each app are scattered around the file system. In this case, you would want
 to use `{{dir}}` rather than `%BASE%`._
+
+
+### Additional substitutions
+
+A powerful feature is that `serman install` allows you to pass in additional substitutions
+as an argument. This is suitable for cases you want to pass secret API key as environment variable
+to your app, but don't want to directly put that in the manifest.
+
+For example, specify `{{API_KEY}}` in the manifest:
+
+    <!-- manifest file -->
+    <service>
+      <id>hello</id>
+      <name>hello</name>
+      <description>This service runs hello continuous integration system.</description>
+      <env name="API_KEY" value="{{API_KEY}}"/>
+      <env name="NODE_ENV" value="{{NODE_ENV}}"/>
+      <executable>node</executable>
+      <arguments>"{{dir}}\hello.js"</arguments>
+      <logmode>rotate</logmode>
+    </service>
+
+
+When installing the service, run:
+
+    serman install app.xml --values API_KEY=1234_abcd,NODE_ENV=development
+
+
+The installed manifest file would have:
+
+    <!-- manifest file -->
+    <service>
+      <id>hello</id>
+      <name>hello</name>
+      <description>This service runs hello continuous integration system.</description>
+      <env name="API_KEY" value="1234_abcd"/>
+      <env name="NODE_ENV" value="development"/>
+      <executable>node</executable>
+      <arguments>"{{dir}}\hello.js"</arguments>
+      <logmode>rotate</logmode>
+    </service>
 
 
 [1]: https://github.com/kohsuke/winsw
