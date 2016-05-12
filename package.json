@@ -1,7 +1,7 @@
 {
   "name": "serman",
   "version": "0.1.0",
-  "description": "",
+  "description": "Easily managing Windows services",
   "main": "lib/serman.js",
   "scripts": {
     "compile": "babel -d lib src",
@@ -10,7 +10,11 @@
   "bin": {
       "serman": "lib/serman.js"
   },
-  "author": "",
+  "files": [
+      "lib",
+      "bin"
+  ],
+  "author": "kflu",
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.7.4",

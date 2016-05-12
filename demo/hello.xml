@@ -1,0 +1,10 @@
+<service>
+  <id>hello</id>
+  <name>hello</name>
+  <description>This service runs hello continuous integration system.</description>
+  <env name="JENKINS_HOME" value="%BASE%"/>
+  <executable>node</executable>
+  <arguments>"C:\Users\kelu\work\serman\test\hello.js"</arguments>
+  <logmode>rotate</logmode>
+</service>
+
