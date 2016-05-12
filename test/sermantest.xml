@@ -1,0 +1,10 @@
+<service>
+  <id>sermantest</id>
+  <name>sermantest</name>
+  <description>This service runs sermantest continuous integration system.</description>
+  <env name="JENKINS_HOME" value="%BASE%"/>
+  <executable>node</executable>
+  <arguments>"{{dir}}\sermantest.js"</arguments>
+  <logmode>rotate</logmode>
+</service>
+

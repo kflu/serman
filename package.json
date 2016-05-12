@@ -7,7 +7,9 @@
     "compile": "babel -d lib src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "bin": {},
+  "bin": {
+      "serman": "lib/serman.js"
+  },
   "author": "",
   "license": "ISC",
   "dependencies": {
