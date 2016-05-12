@@ -8,17 +8,18 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
-      "serman": "lib/serman.js"
+    "serman": "lib/serman.js"
   },
   "files": [
-      "lib",
-      "bin"
+    "lib",
+    "bin"
   ],
   "author": "kflu",
   "license": "ISC",
   "dependencies": {
     "babel-polyfill": "^6.7.4",
     "bluebird": "^3.3.4",
+    "commander": "^2.9.0",
     "fs-extra": "^0.30.0",
     "hogan.js": "^3.0.2",
     "lodash": "^4.6.1",
