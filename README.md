@@ -112,7 +112,7 @@ The installed manifest file would have:
       <env name="API_KEY" value="1234_abcd"/>
       <env name="NODE_ENV" value="development"/>
       <executable>node</executable>
-      <arguments>"{{dir}}\hello.js"</arguments>
+      <arguments>"c:\path\to\app\hello.js"</arguments>
       <logmode>rotate</logmode>
     </service>
 
