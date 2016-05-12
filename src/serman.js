@@ -10,9 +10,11 @@ var cp = require('child_process');
 var execAsync = Promise.promisify(cp.exec, { multiArgs: true });
 var hogan = require('hogan.js');
 var argv = require('commander');
+var _ = require('lodash');
 
 argv.command('install <service-config>')
-    .description('install a service')
+    .description('install a service: serman install app.xml key1=val1,key2=val2,..')
+    .option('--values <values>', 'extra values')
     .action(resolve(handleInstallAsync));
 
 argv.command('uninstall <service_id>')
@@ -45,24 +47,21 @@ async function runAsync(cmd) {
     } catch (err) {
         throw err;
     } finally {
-        console.log("STDOUT:");
-        console.log("=======");
         console.log(stdout);
-
-        console.log("STDERR:");
-        console.log("=======");
         console.log(stderr);
     }
 }
 
 class Provider {
-    constructor() {
+    constructor(kvp) {
         var SERVICEDIR = 'c:\\serman\\services'
 
         this.config = {
             ServiceDir: SERVICEDIR,
             RawWrapper: path.join(__dirname, '../bin', 'winsw.exe')
         };
+
+        this.kvp = kvp || {};
 
         if (!exists(this.config.ServiceDir)) {
             console.log("creating folder: %s", this.config.ServiceDir);
@@ -92,7 +91,9 @@ class Provider {
 
         var tmpl = await fs.readFileAsync(configFile, 'utf8');
         var compiled = hogan.compile(tmpl);
-        var rendered = compiled.render({ dir: file.dir });
+        var context = _.merge({ dir: file.dir }, this.kvp);
+        console.log("Rendering configuration with %s", JSON.stringify(context));
+        var rendered = compiled.render(context);
 
         var dir = path.parse(this.getConfig(id)).dir;
         if (!exists(dir)) {
@@ -140,16 +141,20 @@ async function logStepAsync(step, f) {
     return res;
 }
 
-async function handleInstallAsync(serviceConfig, start) {
+async function handleInstallAsync(serviceConfig, options) {
     console.log("Install service using config: %s", serviceConfig);
-    var provider = new Provider();
+
+    var parse = (kv) => {
+        var i = kv.indexOf('=');
+        return [kv.substring(0, i), kv.substring(i+1)];
+    };
+
+    var keyValuePairs = options.values.split(',');
+    var provider = new Provider(_.chain(keyValuePairs).map(parse).fromPairs().value());
 
     var serviceId = await logStepAsync('deploy', async () => await provider.deployAsync(serviceConfig)); // deploy config, wrapper, etc.
     await logStepAsync('install', async () => await provider.installAsync(serviceId)); // install the service
-
-    if (start) {
-        await logStepAsync('start', async () => await provider.startAsync(serviceId)); // start the service
-    }
+    await logStepAsync('start', async () => await provider.startAsync(serviceId)); // start the service
 }
 
 async function handleUninstallAsync(serviceId) {
