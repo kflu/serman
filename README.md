@@ -12,11 +12,11 @@ Usage
 
     Usage: serman [options] [command]
 
-
     Commands:
 
       install [options] <service-config>  install a service: serman install app.xml key1=val1,key2=val2,..
       uninstall <service_id>              uninstall a service
+      init <serviceId>                    initiate a service config file in the current directory
 
     Options:
 
