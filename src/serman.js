@@ -3,6 +3,7 @@
 require('babel-polyfill');
 var Promise = require('bluebird');
 var path = require('path');
+var os = require('os');
 var cp = require('process');
 var fs = Promise.promisifyAll(require('fs'));
 var fse = Promise.promisifyAll(require('fs-extra'));
@@ -10,7 +11,26 @@ var cp = require('child_process');
 var execAsync = Promise.promisify(cp.exec, { multiArgs: true });
 var hogan = require('hogan.js');
 var argv = require('commander');
+var chalk = require('chalk');
 var _ = require('lodash');
+
+var TEMPLATE = `\
+{{=<% %>=}}
+<!--
+    {{base}} will be substitute with containing directory path at installation time.
+
+    Document: https://github.com/kflu/serman.
+ -->
+<service>
+  <id><%id%></id>
+  <name><%id%></name>
+  <description>The <%id%> service</description>
+  <env name="__YOUR_ENV_VAR__" value="__VALUE__"/>
+  <executable>__YOUR_EXECUTABLE__</executable>
+  <arguments>"__YOUR_ARGUMENTS__"</arguments>
+  <logmode>rotate</logmode>
+</service>`
+
 
 argv.command('install <service-config>')
     .description('install a service: serman install app.xml key1=val1,key2=val2,..')
@@ -20,6 +40,10 @@ argv.command('install <service-config>')
 argv.command('uninstall <service_id>')
     .description('uninstall a service')
     .action(resolve(handleUninstallAsync));
+
+argv.command('init <serviceId>')
+    .description('initiate a service config file in the current directory')
+    .action(resolve(handleInitAsync));
 
 function resolve(f) {
     function wrapper() {
@@ -55,6 +79,14 @@ async function runAsync(cmd) {
 class Provider {
     constructor(kvp) {
         var SERVICEDIR = 'c:\\serman\\services'
+
+        var sermanconfigfn = path.join(os.homedir(), '.serman.json');
+        if (exists(sermanconfigfn)) {
+            var sermanconfig = require(sermanconfigfn);
+            if (sermanconfig && sermanconfig.serviceDir) {
+                SERVICEDIR = sermanconfig.serviceDir;
+            }
+        }
 
         this.config = {
             ServiceDir: SERVICEDIR,
@@ -149,7 +181,11 @@ async function handleInstallAsync(serviceConfig, options) {
         return [kv.substring(0, i), kv.substring(i+1)];
     };
 
-    var keyValuePairs = options.values.split(',');
+    var keyValuePairs = {};
+    if (options.values) {
+        keyValuePairs = options.values.split(',');
+    }
+
     var provider = new Provider(_.chain(keyValuePairs).map(parse).fromPairs().value());
 
     var serviceId = await logStepAsync('deploy', async () => await provider.deployAsync(serviceConfig)); // deploy config, wrapper, etc.
@@ -164,6 +200,21 @@ async function handleUninstallAsync(serviceId) {
     await logStepAsync('uninstall', async () => await provider.uninstallAsync(serviceId));
 
     console.log("Uninstallation completed.");
+}
+
+async function handleInitAsync(id) {
+    var fn = id + ".xml";
+    if (exists(fn)) {
+        console.log(chalk.red(fn + " already exists. Exit."));
+        return;
+    }
+
+    var rendered = hogan.compile(TEMPLATE).render({id});
+    console.log("Writing service config file to " + fn);
+    var err = await fs.writeFileAsync(fn, rendered);
+    if (err) {
+        throw err;
+    }
 }
 
 argv.parse(process.argv);
