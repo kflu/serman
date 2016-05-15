@@ -28,7 +28,7 @@ app or script into a Window service. The usage pattern is described as below.
 
 1. The developer writes his/her app (`app.js`) that's meant to be deployed as a
    service. Along with the app, the developer writes a simple manifest
-   file (`app.xml`) to describe the service.
+   file (`app.xml`) by running `serman init app` to describe the service.
 2. The developer uploads the application to the machine using whatever
    preferable way it is.
 3. The developer runs `serman install app.xml` to install and start the service.
