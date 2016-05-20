@@ -7,7 +7,7 @@
     using System.Threading.Tasks;
     using Xunit;
     using serman;
-
+    using System.IO;
     public class Tests
     {
         [Fact]
@@ -57,6 +57,22 @@
                     kvp("FOO2", "BAR2"),
                 },
                 vars);
+        }
+
+        [Fact]
+        void TestValues()
+        {
+            var ctx = new Context
+            {
+                Values = new Dictionary<string, string>
+                {
+                    ["foo"] = "bar",
+                    ["x"] = "",
+                },
+                SourceServiceConfigPath = @"a\b\c.txt",
+            };
+            var dir = ctx.PopulateValues().Values["dir"];
+            Assert.Equal(Path.GetFullPath(dir), dir);
         }
     }
 }

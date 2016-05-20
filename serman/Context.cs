@@ -39,5 +39,8 @@
         {
             return Path.Combine(ctx.GetServiceDirectory(), $"{ctx.ServiceId}.exe");
         }
+
+        public static string GetSourceServiceConfigDirectory(this Context ctx) =>
+            Path.GetFullPath(Path.GetDirectoryName(ctx.SourceServiceConfigPath));
     }
 }

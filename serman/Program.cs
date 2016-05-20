@@ -43,6 +43,7 @@
                             Values = ParseCommandLineKeyValues(opts.KeyValues.Split(',')),
                             ServiceId = GetServiceId(opts.Config),
                         }
+                        .PopulateValues()
                         .DeployWrapper()
                         .DeployServiceConfig()
                         .RunWrapper("install")
@@ -71,6 +72,14 @@
 
         internal static string GetServiceId(string configPath) => 
             Path.GetFileNameWithoutExtension(configPath);
+
+        internal static Context PopulateValues(this Context ctx)
+        {
+            ctx.Values = ctx.Values
+                .Concat(new[] { new KeyValuePair<string, string>("dir", ctx.GetSourceServiceConfigDirectory()) })
+                .ToDictionary(kv => kv.Key, kv => kv.Value);
+            return ctx;
+        }
 
         static Context DeployServiceConfig(this Context ctx)
         {
