@@ -1,9 +1,0 @@
-<service>
-  <id>hello</id>
-  <name>hello</name>
-  <description>This service runs hello continuous integration system.</description>
-  <env name="NODE_ENV" value="production"/>
-  <executable>node</executable>
-  <arguments>"{{dir}}\hello.js"</arguments>
-  <logmode>rotate</logmode>
-</service>
