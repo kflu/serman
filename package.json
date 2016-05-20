@@ -1,0 +1,18 @@
+{
+  "name": "serman",
+  "version": "0.2.0",
+  "description": "Easily managing Windows services",
+  "main": "lib/serman.js",
+  "scripts": {
+    "compile": "msbuild",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "serman": "serman/bin/Release/serman.exe"
+  },
+  "files": [
+    "serman/bin/Release"
+  ],
+  "author": "kflu",
+  "license": "ISC"
+}

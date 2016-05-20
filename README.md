@@ -51,13 +51,18 @@ An example manifest file looks like this ([document][2]):
       <executable>node</executable>
       <arguments>"{{dir}}\hello.js"</arguments>
       <logmode>rotate</logmode>
+	  <persistent_env name="FOO_SERVICE_PORT" value="8989" />
     </service>
 
 
 `serman` wraps [winsw][1]. And the manifest file is used by `winsw` and
-documented [here][2] in detail. The only additional feature that `serman` adds
-is that the manifest file is actually a [Mustache][3] template. Upon installing
-a service, `serman` attempts to fill every double curly brace field (`{{XXX}}`)
+documented [here][2] in detail. The additional features that `serman` adds
+are described below.
+
+### Variable Substitutions In Service Configuration
+
+The manifest file is actually a [Mustache][3] template. Upon installing a
+service, `serman` attempts to fill every double curly brace field (`{{XXX}}`)
 with a corresponding substitution.
 
 Currently, the supported fields are:
@@ -76,7 +81,7 @@ of each app are scattered around the file system. In this case, you would want
 to use `{{dir}}` rather than `%BASE%`._
 
 
-### Additional substitutions
+#### Additional substitutions
 
 A powerful feature is that `serman install` allows you to pass in additional substitutions
 as an argument. This is suitable for cases you want to pass secret API key as environment variable
@@ -115,6 +120,17 @@ The installed manifest file would have:
       <arguments>"c:\path\to\app\hello.js"</arguments>
       <logmode>rotate</logmode>
     </service>
+
+
+### Persistent Environment Variables
+
+`<persistent_env name="FOO" value="BAR">` can be used to add `FOO=BAR` as a
+machine-wide persistent environment variable. This is great for service
+discoverability where an installed service can make itself discoverable to
+other apps by looking at the global environment variables.
+
+Environment variable persisting is done after the variable substitutions, so that you can use
+`{{}}` in `<persistent_env>`.
 
 
 [1]: https://github.com/kohsuke/winsw
