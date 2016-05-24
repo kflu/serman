@@ -1,5 +1,21 @@
 Services Manager (serman)
 ====
+serman is a language agnostic Windows services manager built on top of [winsw](https://github.com/kohsuke/winsw). Without manual configuration at installation time, it can quickly and correctly install any app or script as a Windows service. The usage scenario is described as below.
+
+1. The developer writes his/her app (`app.js`) that's meant to be deployed as a
+   service. Along with the app, the developer writes a simple manifest
+   file (`app.xml`) by running `serman init app` to describe the service.
+2. The developer uploads the application to the machine using whatever
+   preferable way it is.
+3. The developer runs `serman install app.xml` to install and start the service.
+4. The developer runs `serman uninstall app` to uninstall the service.
+
+## Quick Links
+* [How to install serman](#install)
+* [Serman command line usage](#usage)
+* Service configuration document
+	* [standard winsw features](https://github.com/kohsuke/winsw#configuration-file-syntax)
+	* [serman additional features]()
 
 Install
 ----
@@ -20,23 +36,10 @@ Usage
 
       install [options] <service-config>  install a service: serman install app.xml key1=val1,key2=val2,..
       uninstall <service_id>              uninstall a service
-      init <serviceId>                    initiate a service config file in the current directory
 
     Options:
 
       -h, --help  output usage information
-
-
-serman is a language agnostic Windows services manager. It helps to quickly and correctly turn any
-app or script into a Window service. The usage pattern is described as below.
-
-1. The developer writes his/her app (`app.js`) that's meant to be deployed as a
-   service. Along with the app, the developer writes a simple manifest
-   file (`app.xml`) by running `serman init app` to describe the service.
-2. The developer uploads the application to the machine using whatever
-   preferable way it is.
-3. The developer runs `serman install app.xml` to install and start the service.
-4. The developer runs `serman uninstall app` to uninstall the service.
 
 
 ### Benefits
@@ -62,6 +65,8 @@ An example manifest file looks like this ([document][2]):
 `serman` wraps [winsw][1]. And the manifest file is used by `winsw` and
 documented [here][2] in detail. The additional features that `serman` adds
 are described below.
+
+## Serman Features
 
 ### Variable Substitutions In Service Configuration
 
