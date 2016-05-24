@@ -4,6 +4,10 @@ Services Manager (serman)
 Install
 ----
 
+Get the binary from [releases](https://github.com/kflu/serman/releases). 
+
+Or [from NPM](https://www.npmjs.com/package/serman):
+
     npm install -g serman
 
 
