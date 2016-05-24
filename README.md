@@ -15,7 +15,7 @@ serman is a language agnostic Windows services manager built on top of [winsw](h
 * [Serman command line usage](#usage)
 * Service configuration document
 	* [standard winsw features](https://github.com/kohsuke/winsw#configuration-file-syntax)
-	* [serman additional features]()
+	* [serman additional features](#serman-features)
 
 Install
 ----
