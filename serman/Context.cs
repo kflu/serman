@@ -21,6 +21,11 @@
         /// The key-value pairs to be set in target service config file as env vars
         /// </summary>
         public IDictionary<string,string> Values { get; internal set; }
+
+        /// <summary>
+        /// Overwrite existing service directory
+        /// </summary>
+        public bool Overwrite { get; internal set; }
     }
 
     public static class ContextUtils
@@ -41,6 +46,6 @@
         }
 
         public static string GetSourceServiceConfigDirectory(this Context ctx) =>
-            Path.GetFullPath(Path.GetDirectoryName(ctx.SourceServiceConfigPath));
+            Path.GetDirectoryName(Path.GetFullPath(ctx.SourceServiceConfigPath));
     }
 }

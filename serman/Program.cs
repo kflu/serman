@@ -17,8 +17,11 @@
         [Value(0, MetaName = "config", HelpText = "The service configuration file to install")]
         public string Config { get; set; }
 
-        [Value(1, MetaName = "KeyValues", HelpText = "The key value pairs (key=value) to be used to fill in the service configuration file template")]
+        [Value(1, MetaName = "KeyValues", Default = "", HelpText = "The key value pairs (key=value) to be used to fill in the service configuration file template")]
         public string KeyValues { get; set; }
+
+        [Option(Default = false, HelpText = "Overwrite the existing service directory")]
+        public bool Overwrite { get; set; }
     }
 
     [Verb("uninstall", HelpText = "Uninstall a service")]
@@ -32,37 +35,54 @@
     {
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<InstallOpts, UninstallOpts>(args)
-                .MapResult(
-                    (InstallOpts opts) =>
-                    {
-                        new Context
-                        {
-                            Config = new Configuration(),
-                            SourceServiceConfigPath = opts.Config,
-                            Values = ParseCommandLineKeyValues(opts.KeyValues.Split(',')),
-                            ServiceId = GetServiceId(opts.Config),
-                        }
-                        .PopulateValues()
-                        .DeployWrapper()
-                        .DeployServiceConfig()
-                        .RunWrapper("install")
-                        .RunWrapper("start");
+            if (args.Contains("--pause-on-start"))
+            {
+                Console.Read();
+                args = args.Where(a => a != "--pause-on-start").ToArray();
+            }
 
-                        return 0;
-                    },
-                    (UninstallOpts opts) =>
-                    {
-                        new Context
+            try
+            {
+                Parser.Default.ParseArguments<InstallOpts, UninstallOpts>(args)
+                    .MapResult(
+                        (InstallOpts opts) =>
                         {
-                            Config = new Configuration(),
-                            ServiceId = opts.Id,
-                        }
-                        .RunWrapper("uninstall");
+                            new Context
+                            {
+                                Config = new Configuration(),
+                                SourceServiceConfigPath = opts.Config,
+                                Values = ParseCommandLineKeyValues(string.IsNullOrEmpty(opts.KeyValues) ? null : opts.KeyValues.Split(',')),
+                                ServiceId = GetServiceId(opts.Config),
+                                Overwrite = opts.Overwrite,
+                            }
+                            .PopulateValues()
+                            .DeployWrapper()
+                            .DeployServiceConfig()
+                            .RunWrapper("install")
+                            .RunWrapper("start");
 
-                        return 0;
-                    },
-                    errs => 1);
+                            return 0;
+                        },
+                        (UninstallOpts opts) =>
+                        {
+                            var ctx = new Context
+                            {
+                                Config = new Configuration(),
+                                ServiceId = opts.Id,
+                            }
+                            .RunWrapper("uninstall");
+
+                            Console.WriteLine("Done. You should manually remove directory " + ctx.GetServiceDirectory());
+
+                            return 0;
+                        },
+                        errs => 1);
+            }
+            catch (HandlableException e)
+            {
+                Console.WriteLine(e.Message);
+                Environment.Exit(-1);
+            }
         }
 
         internal static IDictionary<string, string> ParseCommandLineKeyValues(string[] kvs) =>
@@ -83,7 +103,6 @@
 
         static Context DeployServiceConfig(this Context ctx)
         {
-            EnsureDirectory(ctx.GetServiceDirectory());
             string xml = File.ReadAllText(ctx.SourceServiceConfigPath);
 
             // render xml
@@ -99,8 +118,8 @@
 
         static Context DeployWrapper(this Context ctx)
         {
-            EnsureDirectory(ctx.GetServiceDirectory());
-            File.Copy(ctx.Config.WrapperPath, ctx.GetTargetWrapperPath());
+            EnsureDirectory(ctx.GetServiceDirectory(), ctx.Overwrite);
+            File.Copy(ctx.Config.WrapperPath, ctx.GetTargetWrapperPath(), ctx.Overwrite);
             return ctx;
         }
 
@@ -111,8 +130,13 @@
             return ctx;
         }
 
-        private static void EnsureDirectory(string serviceDirectory)
+        private static void EnsureDirectory(string serviceDirectory, bool overwrite)
         {
+            if (!overwrite && Directory.Exists(serviceDirectory))
+            {
+                throw new HandlableException($"Service directory already exists: {serviceDirectory}. Consider use --overwrite to force install.");
+            }
+
             Directory.CreateDirectory(serviceDirectory);
         }
 
@@ -157,6 +181,13 @@
                 Console.WriteLine($"Exporting environment variable {kv.Key}={kv.Value}...");
                 using (ProcessEx.RunAsync("cmd.exe", $"/c SETX {kv.Key} {kv.Value} /M").Result.Display()) { }
             });
+        }
+    }
+
+    class HandlableException : Exception
+    {
+        public HandlableException(string msg) : base(msg)
+        {
         }
     }
 }
