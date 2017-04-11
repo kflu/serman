@@ -17,18 +17,21 @@ serman is a language agnostic Windows services manager built on top of [winsw](h
 	* [standard winsw features](https://github.com/kohsuke/winsw#configuration-file-syntax)
 	* [serman additional features](#serman-features)
 
-Install
-----
+## Install
 
-Get the binary from [releases](https://github.com/kflu/serman/releases). 
+**From Github Release**
 
-Or [from NPM](https://www.npmjs.com/package/serman):
+* Get the binary from [releases](https://github.com/kflu/serman/releases)
+* Unzip it and invoke `serman.exe` from its path
+
+**From NPM**
+
+The pre-built binary is also available as an [NPM package](https://www.npmjs.com/package/serman):
 
     npm install -g serman
 
 
-Usage
-----
+## Usage
 
     Usage: serman [options] [command]
 
