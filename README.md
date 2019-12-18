@@ -146,5 +146,5 @@ Environment variable persisting is done after the variable substitutions, so tha
 
 
 [1]: https://github.com/kohsuke/winsw
-[2]: https://github.com/kohsuke/winsw#configuration-file-syntax
+[2]: https://github.com/kohsuke/winsw/blob/master/doc/xmlConfigFile.md
 [3]: https://en.wikipedia.org/wiki/Mustache_(template_system)
